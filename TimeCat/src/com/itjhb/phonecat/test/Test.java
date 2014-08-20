@@ -41,7 +41,7 @@ public class Test extends AndroidTestCase {
 //				e.printStackTrace();
 //			}
 //		}
-		List<String> list=dao.getAllLog("2014-08-19", "2014-08-21");
+		List<Long> list=dao.getAllLog("2014-08-19", "2014-08-21");
 		System.out.println(list);
 	}
 	

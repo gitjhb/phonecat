@@ -1,6 +1,10 @@
 package com.itjhb.phonecat.db;
 
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 
 import android.content.Context;
@@ -79,15 +83,25 @@ public class TimeDao {
 	/**
 	 * 查找全部记录
 	 */
-	public List<String> getAllLog(String date1, String date2) {
+	public List<Long> getAllLog(String date1, String date2) {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		List<String> timeList = new ArrayList<String>();
+		List<Long> timeList = new ArrayList<Long>();
 		if (db.isOpen()) {
 			Cursor cursor = db.rawQuery("select * from "+MyDatabaseHelper.DB_NAME+" where _dateTime>=? AND _dateTime<?", 
 					new String[]{date1,date2} );
 			while (cursor.moveToNext()) {
 				String date = cursor.getString(2);
-				timeList.add(date);
+				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				try {
+					Date d = (Date) df.parse(date);
+					Long time = d.getTime();
+					timeList.add(time);
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+				
+				
 			}
 			cursor.close();
 			db.close();
