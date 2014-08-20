@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.itjhb.phonecat.db.TimeDao;
 import com.itjhb.phonecat.utils.AppConstant;
 import com.itjhb.phonecat.utils.Utils;
 
@@ -21,7 +22,9 @@ import android.util.Log;
 
 public class ListenService extends Service {
 
+	//service is context!
 	SharedPreferences sp;
+	TimeDao dao;
 	Editor myEditor;
 	String key;
 	String keyTotal;
@@ -57,6 +60,7 @@ public class ListenService extends Service {
 		isOn = true;
 		key = Utils.timeToKey();
 		keyTotal = Utils.timeToKeyTotalTime();
+		dao= new TimeDao(this);
 		loadSecs();
 		loadLog();
 		Log.i("cat", "监听服务创建");
