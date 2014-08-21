@@ -13,7 +13,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper{
 	
 
 	public MyDatabaseHelper(Context context) {
-		super(context, DB_NAME, null, version);
+		super(context, "runtime.db", null, version);
 		// TODO Auto-generated constructor stub
 	}
 

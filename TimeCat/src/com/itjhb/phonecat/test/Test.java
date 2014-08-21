@@ -1,9 +1,11 @@
 package com.itjhb.phonecat.test;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 
 import com.itjhb.phonecat.db.TimeDao;
+import com.itjhb.phonecat.db.TotalTimeDao;
 import com.itjhb.phonecat.utils.AppConstant;
 import com.itjhb.phonecat.utils.Utils;
 
@@ -16,34 +18,54 @@ import junit.framework.TestCase;
 
 public class Test extends AndroidTestCase {
 	
-	public void testUtils() throws Exception {
+
+	
+	
+//	public void testAdd() throws Exception{
+//		TimeDao dao=new TimeDao(getContext());
+//		assertEquals(dao.add(0), true);
+//	}
+//	
+//	public void testDB() throws SQLException{
+//		TimeDao dao=new TimeDao(getContext());
+////		for(int i=0;i<20;i++){
+////			dao.add(i%2);
+////			try {
+////				Thread.sleep(50);
+////			} catch (InterruptedException e) {
+////				// TODO Auto-generated catch block
+////				e.printStackTrace();
+////			}
+////		}
+//		List<Long> list=dao.getAllLog("2014-08-19", "2014-08-21");
+//		System.out.println(list);
+//	}
+
+	public void testInsert (){
+		TotalTimeDao dao= new TotalTimeDao(getContext());
+		dao.add("2014-08-20","223412");
+		dao.add("2014-08-21","1341421");
+		dao.add("2014-08-22","235231");
 		
-		//assertEquals(2, Utils.add(1, 1));
-		SharedPreferences sp= getContext().getSharedPreferences(AppConstant.SP_NAME, Context.MODE_PRIVATE);
-		
+	}
+	public void testQuery (){
+		TotalTimeDao dao= new TotalTimeDao(getContext());
+		System.out.print(dao.query("2014-08-20"));
 		
 	}
 	
-	
-	public void testAdd() throws Exception{
-		TimeDao dao=new TimeDao(getContext());
-		assertEquals(dao.add(0), true);
+	public void testUpdate(){
+		TotalTimeDao dao= new TotalTimeDao(getContext());
+		dao.update("2014-08-20", "20102220");
+		System.out.print(dao.query("2014-08-20"));
 	}
 	
-	public void testDB() throws SQLException{
-		TimeDao dao=new TimeDao(getContext());
-//		for(int i=0;i<20;i++){
-//			dao.add(i%2);
-//			try {
-//				Thread.sleep(50);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
-		List<Long> list=dao.getAllLog("2014-08-19", "2014-08-21");
-		System.out.println(list);
+	public void testQueryAll(){
+		TotalTimeDao dao= new TotalTimeDao(getContext());
+		HashMap<String, String> map =dao.getAllTotalTime();
+		assertEquals(map.containsKey("2014-08-20"),true);
+		assertEquals(map.containsKey("2014-08-21"),true);
+		assertEquals(map.containsKey("2014-08-22"),true);
 	}
-	
 
 }
