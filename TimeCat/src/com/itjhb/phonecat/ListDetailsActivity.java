@@ -6,6 +6,7 @@ import java.util.List;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.itjhb.phonecat.db.TimeDao;
 import com.itjhb.phonecat.utils.AppConstant;
 import com.itjhb.phonecat.utils.Utils;
 
@@ -17,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class ListDetailsActivity extends Activity {
@@ -28,6 +30,7 @@ public class ListDetailsActivity extends Activity {
 	private SharedPreferences sp;
 	AppListAdapter adapter;
 	private String key;
+	private TextView tv_date;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,25 +79,26 @@ public class ListDetailsActivity extends Activity {
 
 	private void init() {
 		listViewData = new ArrayList<ArrayList<String>>();
-		timeList = new ArrayList<String>();
+		tv_date=(TextView) findViewById(R.id.tv_showdate);
+		tv_date.setText("Details of "+Utils.timeToKey()+" :");
+		timeList = new TimeDao(this).getAllLog(Utils.timeToKey(), Utils.timeToKeyP1());;
 		// Use current date as the key
 		key = Utils.timeToKey();
-		sp = getSharedPreferences(AppConstant.SP_NAME, Context.MODE_PRIVATE);
+//		sp = getSharedPreferences(AppConstant.SP_NAME, Context.MODE_PRIVATE);
 
-		String timePeriod = sp.getString(key, null);
-		if (timePeriod != null) {
-			String[] strings = timePeriod.split(",");
-			for (String string : strings) {
-				timeList.add(string);
-			}
-		} else {
-			Toast.makeText(getApplicationContext(), "No log file", 0).show();
-		}
+//		String timePeriod = sp.getString(key, null);
+//		if (timePeriod != null) {
+//			String[] strings = timePeriod.split(",");
+//			for (String string : strings) {
+//				timeList.add(string);
+//			}
+//		} else {
+//			Toast.makeText(getApplicationContext(), "No log file", 0).show();
+//		}
 
-		long totalTime = Utils.calculateData(timeList, listViewData);
+		Utils.calculateData(timeList, listViewData);
 
 		adapter = new AppListAdapter(this, listViewData);
-		
 		appListView.setAdapter(adapter);
 	}
 }

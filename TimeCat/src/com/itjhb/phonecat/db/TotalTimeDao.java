@@ -25,7 +25,10 @@ public class TotalTimeDao {
 			ContentValues values=new ContentValues();
 			values.put(TotalTimeDatabaseHelper.COLUMN_KEY, date);
 			values.put(TotalTimeDatabaseHelper.COLUMN_TOTAL, time);
-			db.insert(TotalTimeDatabaseHelper.TABLE_TOTAL, null, values);
+			if(db.insert(TotalTimeDatabaseHelper.TABLE_TOTAL, null, values)==-1){
+				Log.i(tag, "Add colomn failed, update!");
+				update(date, time);
+			}
 //			db.execSQL("INSERT INTO totaltime (key, total) values (date(),?)",new String[]{time});
 			Log.i(tag, "Add colomn successfully!");
 			db.close();
@@ -33,21 +36,31 @@ public class TotalTimeDao {
 
 	}
 
-	public boolean query(String date) {
-		boolean result = false;
+	/**
+	 * 
+	 * @param date
+	 * @return a Integer value which represent the total secs device used of this day.
+	 */
+	public int query(String date) {
+		int result=-1;
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		if (db.isOpen()) {
-			Cursor cursor =db.query(TotalTimeDatabaseHelper.TABLE_TOTAL,
-					null, TotalTimeDatabaseHelper.COLUMN_KEY+"=?", new String[]{date}, null, null, null);
-			
+//			Cursor cursor =db.query(TotalTimeDatabaseHelper.TABLE_TOTAL,
+//					null, TotalTimeDatabaseHelper.COLUMN_KEY+" = "+date,null, null, null, null);
+			Cursor cursor =db.rawQuery("SELECT total from totaltime where key=?", new String[]{date});
+			if(cursor.getCount()>=1) {
 			if (cursor.moveToNext()) {
-				System.out.println(cursor.getString(2));
-				result = true;
+				
+				System.out.println(cursor.getString(0));
+				 result=Integer.valueOf(cursor.getString(0));
 			}
 			cursor.close();
 			db.close();
+			
+			}
 		}
 		return result;
+		
 	}
 	
 	/**

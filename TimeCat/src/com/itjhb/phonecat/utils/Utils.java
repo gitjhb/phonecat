@@ -1,8 +1,10 @@
 package com.itjhb.phonecat.utils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,40 +13,51 @@ import android.R.integer;
 public class Utils {
 
 	public static String timeToKey() {
-		Calendar date = Calendar.getInstance();
-		String year= String.valueOf(date.get(Calendar.YEAR));
-		String month=String.valueOf(date.get(Calendar.MONTH) + 1);
-		if(month.length()==1) {month="0"+month;}
-		String day=String.valueOf(date.get(Calendar.DAY_OF_MONTH));
-		if(day.length()==1) {day="0"+day;}
-		String timeLabel = String.format("%sY%sM%sD",year,
-				month, day);
-		return timeLabel;
+		SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");
+		Date date=new Date();
+		
+//		Calendar date = Calendar.getInstance();
+//		String year= String.valueOf(date.get(Calendar.YEAR));
+//		String month=String.valueOf(date.get(Calendar.MONTH) + 1);
+//		if(month.length()==1) {month="0"+month;}
+//		String day=String.valueOf(date.get(Calendar.DAY_OF_MONTH));
+//		if(day.length()==1) {day="0"+day;}
+//		String timeLabel = String.format("%sY%sM%sD",year,
+//				month, day);
+		return format.format(date);
+	}
+	public static String timeToKeyP1(){
+		SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
+		Calendar cal = new GregorianCalendar();
+		cal.add(Calendar.DAY_OF_MONTH, 1);
+		dateFormat.setTimeZone(cal.getTimeZone());
+		return dateFormat.format(cal.getTime());
+		
 	}
 
-	public static String timeToKeyTotalTime() {
-		return timeToKey() + "Total";
-	}
+//	public static String timeToKeyTotalTime() {
+//		return timeToKey() + "Total";
+//	}
 
 	public static ArrayList<String> timeToDuration(long beginTime, long endTime) {
 
 		long duration = endTime - beginTime;
-		
+		Date date=new Date(duration);
 		int nHour = (int) (duration/(1000*60*60));
 		int nMinute = (int) ((duration-nHour*60*60*1000)/(1000*60));
 		int nSecond = (int) ((duration-nHour*60*60*1000-nMinute*60*1000)/1000);
 	
 		
 
-		Calendar start = Calendar.getInstance();
-		Calendar end = Calendar.getInstance();
+		Calendar start = new GregorianCalendar();
+		Calendar end = new GregorianCalendar();
 		start.setTimeInMillis(beginTime);
 		end.setTimeInMillis(endTime);
-		String startString = String.format("From: %d : %d",
-				start.get(Calendar.HOUR_OF_DAY), start.get(Calendar.MINUTE));
-		String endString = String.format("To : %d : %d",
-				end.get(Calendar.HOUR_OF_DAY), end.get(Calendar.MINUTE));
-		String duraString = String.format("%d h : %d m : %d s",
+		String startString = String.format("From: %02d : %02d : %02d",
+				start.get(Calendar.HOUR_OF_DAY), start.get(Calendar.MINUTE), start.get(Calendar.SECOND));
+		String endString = String.format("To : %02d : %02d : %02d",
+				end.get(Calendar.HOUR_OF_DAY), end.get(Calendar.MINUTE), end.get(Calendar.SECOND));
+		String duraString = String.format("%02d h : %02d m : %02d s",
 				nHour, nMinute, nSecond);
 		ArrayList<String> res = new ArrayList<String>();
 		
@@ -73,8 +86,12 @@ public class Utils {
 		while (iterator.hasNext()) {
 			String temp1 = iterator.next();
 			if (temp1.length() > 0 && temp1.substring(0, 2).equals("ON")) {
+				String temp2=null;
 				if (iterator.hasNext()) {
-					String temp2 = iterator.next();
+					temp2 = iterator.next();
+						while(iterator.hasNext() && temp2.substring(0, 2).equals("ON")){
+							temp2=iterator.next();
+						}
 					if (temp2.length() > 0
 							&& temp2.substring(0, 2).equals("OF")) {
 						long beginTime = Long.parseLong(temp1.substring(2));
@@ -83,7 +100,7 @@ public class Utils {
 								beginTime, endTime);
 						totalTime += endTime - beginTime;
 						res.add(temp);
-					}
+					} 
 				}
 			}
 		}

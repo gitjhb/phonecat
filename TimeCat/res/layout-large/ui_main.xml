@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFFFFF"
+    android:background="@drawable/background"
 
      >
 
@@ -13,26 +13,14 @@
         android:layout_height="200dp" >
 
         <TextView
-            android:id="@+id/tv1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="20dp"
-            android:text="The total time of your phone running today is:"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <TextView
             android:id="@+id/tv2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/tv1"
-            android:textSize="60sp"
             android:layout_centerHorizontal="true"
-            android:layout_marginLeft="42dp"
-            android:layout_marginTop="24dp"
-            android:text="Time" >
-        </TextView>
+            android:layout_centerVertical="true"
+            android:text="Time"
+            android:textSize="60sp" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -44,13 +32,14 @@
             android:id="@+id/gridview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="50dip"
-            android:layout_marginRight="50dip"
+            android:layout_marginLeft="80dip"
+            android:layout_marginRight="80dip"
             android:layout_marginTop="15dip"
-            android:horizontalSpacing="50dip"
             android:listSelector="@drawable/item_background_selector"
             android:numColumns="2"
-            android:verticalSpacing="50dip" >
+            android:verticalSpacing="50dip"
+            android:horizontalSpacing="100dip"
+             >
         </GridView>
     </RelativeLayout>
 

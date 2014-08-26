@@ -21,7 +21,7 @@ import android.widget.TextView;
 public class AppListAdapter extends BaseAdapter {
 
 	private Context context;
-	private List<ArrayList<String>> listViewData;
+	private ArrayList<ArrayList<String>> listViewData;
 
 	public AppListAdapter(Context context, ArrayList<ArrayList<String>> list) {
 		this.context = context;

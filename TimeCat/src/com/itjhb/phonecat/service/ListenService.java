@@ -5,6 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.itjhb.phonecat.db.TimeDao;
+import com.itjhb.phonecat.db.TotalTimeDao;
 import com.itjhb.phonecat.utils.AppConstant;
 import com.itjhb.phonecat.utils.Utils;
 
@@ -25,6 +26,7 @@ public class ListenService extends Service {
 	//service is context!
 	SharedPreferences sp;
 	TimeDao dao;
+	TotalTimeDao totalDao;
 	Editor myEditor;
 	String key;
 	String keyTotal;
@@ -50,24 +52,25 @@ public class ListenService extends Service {
 		}
 
 	}
+	
+	
 
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
 		super.onCreate();
-		sp = getSharedPreferences(AppConstant.SP_NAME, Context.MODE_PRIVATE);
-		myEditor = sp.edit();
 		isOn = true;
 		key = Utils.timeToKey();
-		keyTotal = Utils.timeToKeyTotalTime();
 		dao= new TimeDao(this);
-		loadSecs();
-		loadLog();
+		totalDao=new TotalTimeDao(this);
+		totalSecs=totalDao.query(Utils.timeToKey());
+		if(!dao.query()){
+			dao.add("ON");
+		}
+		saveSecs();
 		Log.i("cat", "监听服务创建");
 		Log.i("cat", "读取记录：" + String.valueOf(totalSecs));
-
 		myBinder = new MyBinder();
-
 		final IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_SCREEN_OFF);
 		filter.addAction(Intent.ACTION_SCREEN_ON);
@@ -97,7 +100,7 @@ public class ListenService extends Service {
 						if (totalSecs % 100 == 0) {
 							saveSecs();
 						}
-						dateChangeListener();
+//						dateChangeListener();
 					}
 
 				}
@@ -139,30 +142,35 @@ public class ListenService extends Service {
 		return super.onStartCommand(intent, flags, startId);
 
 	}
-
-	private void saveSecs() {
-		Log.i("cat", "储存");
-		SharedPreferences sp = getSharedPreferences(AppConstant.SP_NAME,
-				Context.MODE_PRIVATE);
-		Editor myEditor = sp.edit();
-		myEditor.putInt(keyTotal, totalSecs);
-		myEditor.commit();
-	}
-
-	private void loadSecs() {
-		sp = getSharedPreferences(AppConstant.SP_NAME, Context.MODE_PRIVATE);
-		int secs = sp.getInt(keyTotal, -1);
-		if (secs == -1) {
-			totalSecs = 0;
-			saveSecs();
+	
+	private void saveSecs(){
+		if(totalDao.query(Utils.timeToKey())==-1){
+			totalDao.add(Utils.timeToKey(), String.valueOf(totalSecs));
 		} else {
-			totalSecs = secs;
+			totalDao.update(Utils.timeToKey(), String.valueOf(totalSecs));
 		}
-
 	}
+
+//	private void saveSecs() {
+//		Log.i("cat", "储存");
+//		SharedPreferences sp = getSharedPreferences(AppConstant.SP_NAME,
+//				Context.MODE_PRIVATE);
+//		Editor myEditor = sp.edit();
+//		myEditor.putInt(keyTotal, totalSecs);
+//		myEditor.commit();
+//	}
+//
+//	private void loadSecs() {
+//		if (secs == -1) {
+//			totalSecs = 0;
+//			saveSecs();
+//		} else {
+//			totalSecs = secs;
+//		}
+//
+//	}
 
 	private void saveLog() {
-
 		Calendar calendar = Calendar.getInstance();
 		String currentTime = String.valueOf(calendar.getTimeInMillis());
 		String currentSP = sp.getString(key, "");
@@ -197,15 +205,14 @@ public class ListenService extends Service {
 				isOn = false;
 				Log.i("cat", "停止计时");
 				stopTimer();
-				saveLog();
-
 				saveSecs();
+				dao.add("OF");
 			} else if (action.equals(Intent.ACTION_SCREEN_ON)) {
 				isOn = true;
 				Log.i("cat", "开始计时");
 				startTimer();
-				saveLog();
-				loadSecs();
+				dao.add("ON");
+				totalSecs=totalDao.query(Utils.timeToKey());
 			}
 
 		}

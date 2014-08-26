@@ -3,9 +3,18 @@
     tools:context="com.itjhb.phonecat.MainActivity" >
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/item1"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
+        android:showAsAction="ifRoom"
+        android:title="@string/action_settings">
+        <menu>
+            <item
+                android:id="@+id/subItem1"
+                android:title="subItem1"/>
+              <item
+                android:id="@+id/subItem2"
+                android:title="subItem2"/>
+        </menu>
+    </item>
 
 </menu>

@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class TotalTimeDatabaseHelper extends SQLiteOpenHelper{
 	
 	public TotalTimeDatabaseHelper(Context context) {
-		super(context, "totalTime.db", null, 1);
+		super(context, "totalTime.db", null, 3);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -20,7 +20,7 @@ public class TotalTimeDatabaseHelper extends SQLiteOpenHelper{
 	private static final String DATABASE_CREATE = "create table "
 		      + TABLE_TOTAL + "(" + COLUMN_ID
 		      + " integer primary key autoincrement, " + COLUMN_KEY
-		      + " text not null, "+COLUMN_TOTAL+" text not null);";
+		      + " text UNIQUE not null, "+COLUMN_TOTAL+" text not null);";
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {

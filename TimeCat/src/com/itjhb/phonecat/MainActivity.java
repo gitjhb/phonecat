@@ -2,11 +2,15 @@ package com.itjhb.phonecat;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuInflater;
+import com.itjhb.phonecat.db.TotalTimeDao;
 import com.itjhb.phonecat.service.IService;
 import com.itjhb.phonecat.service.ListenService;
 import com.itjhb.phonecat.service.ListenService.MyBinder;
@@ -56,10 +60,13 @@ public class MainActivity extends Activity {
 	protected static final int MSG_WHAT_TIME_TICK = 0;
 	private static final int MSG_WHAT_UPDATE_UI = 1;
 	private TextView tvTotalTime;
+	com.actionbarsherlock.app.ActionBar actionBar;
 
 	ListenService.MyBinder myBinder;
+	ArrayList<String> keys = null;
+	HashMap<String, String> map;
 	MyConnection conn;
-	SlidingMenu slidingMenu=null;
+	SlidingMenu slidingMenu = null;
 
 	Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
@@ -78,7 +85,6 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.ui_main);
 		findViewById();
-
 		// 开启服务
 		Intent intent = new Intent(getApplicationContext(), ListenService.class);
 		startService(intent);
@@ -86,8 +92,8 @@ public class MainActivity extends Activity {
 
 		bind();
 
-		showUI();
-		
+	
+
 		slidingMenu = new SlidingMenu(this);
 		slidingMenu.setMode(SlidingMenu.LEFT_RIGHT);
 		slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN); // 触摸边界拖出菜单
@@ -96,90 +102,110 @@ public class MainActivity extends Activity {
 		slidingMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
 		// 将抽屉菜单与主页面关联起来
 		slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-		
-		GridView gridView=(GridView)findViewById(R.id.gridview);  
-        gridView.setAdapter(new ImageAdapter(this));  
-        //单击GridView元素的响应  
-        gridView.setOnItemClickListener(new OnItemClickListener() {  
-  
-            @Override  
-            public void onItemClick(AdapterView<?> parent, View view,  
-                    int position, long id) {  
-                //弹出单击的GridView元素的位置  
-                switch (position) {
+
+		map = new TotalTimeDao(this).getAllTotalTime();
+		keys = new ArrayList<String>();
+		Set<String> keyStrings = map.keySet();
+		for (String string : keyStrings) {
+			keys.add(string);
+		}
+		View slidView = slidingMenu.getMenu();
+		ListView lv_total = (ListView) slidView.findViewById(R.id.lv_totalTime);
+		lv_total.setAdapter(new MyTotalAdapter());
+
+		GridView gridView = (GridView) findViewById(R.id.gridview);
+		gridView.setAdapter(new ImageAdapter(this));
+		// 单击GridView元素的响应
+		gridView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				// 弹出单击的GridView元素的位置
+				switch (position) {
 				case 0:
-					Intent intent0= new Intent(getApplicationContext(),TimeActivity.class);
+					Intent intent0 = new Intent(getApplicationContext(),
+							TimeActivity.class);
 					startActivity(intent0);
 					break;
 				case 1:
-					Intent intent1= new Intent(getApplicationContext(),ListDetailsActivity.class);
+					Intent intent1 = new Intent(getApplicationContext(),
+							ListDetailsActivity.class);
 					startActivity(intent1);
 					break;
 				case 2:
-					Intent intent2= new Intent(MainActivity.this,DrawActivity.class);
+					Intent intent2 = new Intent(MainActivity.this,
+							DrawActivity.class);
 					startActivity(intent2);
 					break;
 				case 3:
-					Intent intent3= new Intent(MainActivity.this,StopWatch.class);
+					Intent intent3 = new Intent(MainActivity.this,
+							StopWatch.class);
 					startActivity(intent3);
+					break;
+				case 4:
+					Intent intent4 = new Intent(MainActivity.this,
+							MyCalendar.class);
+					startActivity(intent4);
 					break;
 
 				}
-            }  
-        });  
-    }  
-	
-	
-    private class ImageAdapter extends BaseAdapter{  
-        private Context mContext;  
-  
-        public ImageAdapter(Context context) {  
-            this.mContext=context;  
-        }  
-  
-        @Override  
-        public int getCount() {  
-            return mThumbIds.length;  
-        }  
-  
-        @Override  
-        public Object getItem(int position) {  
-            return mThumbIds[position];  
-        }  
-  
-        @Override  
-        public long getItemId(int position) {  
-            // TODO Auto-generated method stub  
-            return 0;  
-        }  
-  
-        @Override  
-        public View getView(int position, View convertView, ViewGroup parent) {  
-            //定义一个ImageView,显示在GridView里  
-            ImageView imageView;  
-            if(convertView==null){  
-                imageView=new ImageView(mContext);  
-                imageView.setLayoutParams(new GridView.LayoutParams(300, 300));  
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);  
-                imageView.setPadding(8, 8, 8, 8);  
-            }else{  
-                imageView = (ImageView) convertView;  
-            }  
-            imageView.setImageResource(mThumbIds[position]);  
-            return imageView;  
-        }  
-          
-  
-          
-    }  
-    //展示图片  
-    private Integer[] mThumbIds = {  
-            R.drawable.grid1, R.drawable.grid2,  
-            R.drawable.grid3, R.drawable.grid4,  
-         
-    };  
+			}
+		});
+	}
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		showUI();
+	}
 
-	
+	private class ImageAdapter extends BaseAdapter {
+		private Context mContext;
+
+		public ImageAdapter(Context context) {
+			this.mContext = context;
+		}
+
+		@Override
+		public int getCount() {
+			return mThumbIds.length;
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return mThumbIds[position];
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// 定义一个ImageView,显示在GridView里
+			ImageView imageView;
+			if (convertView == null) {
+				imageView = new ImageView(mContext);
+				imageView.setLayoutParams(new GridView.LayoutParams(300, 300));
+				imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+				imageView.setPadding(8, 8, 8, 8);
+			} else {
+				imageView = (ImageView) convertView;
+			}
+			imageView.setImageResource(mThumbIds[position]);
+			return imageView;
+		}
+
+	}
+
+	// 展示图片
+	private Integer[] mThumbIds = { R.drawable.grid1, R.drawable.grid2,
+			R.drawable.grid3, R.drawable.grid4, R.drawable.grid5
+
+	};
 
 	private void showUI() {
 		new Thread() {
@@ -191,7 +217,7 @@ public class MainActivity extends Activity {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			
+
 			};
 		}.start();
 
@@ -229,25 +255,7 @@ public class MainActivity extends Activity {
 		tvTotalTime = (TextView) findViewById(R.id.tv2);
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
 
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
 
 	public void startService(View view) {
 		Intent intent = new Intent(this, ListenService.class);
@@ -267,6 +275,42 @@ public class MainActivity extends Activity {
 		public void onServiceDisconnected(ComponentName name) {
 			// TODO Auto-generated method stub
 
+		}
+
+	}
+
+	private class MyTotalAdapter extends BaseAdapter {
+
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return map.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// TODO Auto-generated method stub
+			View view = View.inflate(MainActivity.this,
+					R.layout.listview_total_item, null);
+			TextView date = (TextView) view.findViewById(R.id.tv_date);
+			TextView total = (TextView) view.findViewById(R.id.tv_total);
+			String keyString = keys.get(position);
+			date.setText(keyString);
+			total.setText(Utils.timeFormat(Integer.parseInt(map.get(keyString))));
+
+			return view;
 		}
 
 	}

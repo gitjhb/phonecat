@@ -1,11 +1,8 @@
 package com.itjhb.phonecat.db;
 
-import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Formatter;
-import java.util.List;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -21,30 +18,12 @@ public class TimeDao {
 		dbHelper=new MyDatabaseHelper(context);
 	}
 	
-	/**
-	 * 查询
-	 */
-	public boolean find(String number) {
-		boolean result = false;
-		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		if (db.isOpen()) {
-			Cursor cursor = db.rawQuery(
-					"select number from blacknumber where number=?",
-					new String[] { number });
-			if (cursor.moveToNext()) {
-				result = true;
-			}
-			cursor.close();
 
-			db.close();
-		}
-		return result;
-	}
-
+//	SELECT strftime('%s','now') - strftime('%s','2004-01-01 02:34:56');
 	/**
 	 * 添加
 	 */
-	public boolean add(int _switch) {
+	public boolean add(String _switch) {
 		boolean result=false;
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		if (db.isOpen()) {
@@ -55,6 +34,20 @@ public class TimeDao {
 		}
 		return result;
 	}
+	
+	public boolean query(){
+		boolean result=false;
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
+		if(db.isOpen()){
+			Cursor cursor=db.rawQuery("select _switch from runtimelog;",null);
+			if(cursor.getCount()>=1) result=true;
+			db.close();
+		}
+		return result;
+		
+	}
+	
+	
 	
 
 
@@ -83,23 +76,30 @@ public class TimeDao {
 	/**
 	 * 查找全部记录
 	 */
-	public List<Long> getAllLog(String date1, String date2) {
+	public ArrayList<String> getAllLog(String date1, String date2) {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		List<Long> timeList = new ArrayList<Long>();
+		ArrayList<String> timeList = new ArrayList<String>();
 		if (db.isOpen()) {
 			Cursor cursor = db.rawQuery("select * from "+MyDatabaseHelper.DB_NAME+" where _dateTime>=? AND _dateTime<?", 
 					new String[]{date1,date2} );
 			while (cursor.moveToNext()) {
+				String state=cursor.getString(1);
 				String date = cursor.getString(2);
+				
 				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				
 				try {
-					Date d = (Date) df.parse(date);
-					Long time = d.getTime();
-					timeList.add(time);
+					java.util.Date date3=df.parse(date);
+					long mills=date3.getTime();
+					timeList.add(state+String.valueOf(mills));
+					
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} 
+				}
+				
+				
+//				timeList.add(state+time); 
 				
 				
 			}

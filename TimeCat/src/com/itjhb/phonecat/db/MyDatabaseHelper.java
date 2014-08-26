@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MyDatabaseHelper extends SQLiteOpenHelper{
 	
 	public static String DB_NAME="runtimelog";
-	public static int version=1;
+	public static int version=2;
 	private SQLiteDatabase db;
 	
 
@@ -21,7 +21,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper{
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		// TODO Auto-generated method stub
-		db.execSQL("CREATE TABLE "+DB_NAME+" (_id integer primary key autoincrement, _switch integer, _datetime DATETIME)");
+		db.execSQL("CREATE TABLE "+DB_NAME+" (_id integer primary key autoincrement, _switch text, _dateTime DATETIME)");
 	}
 
 
